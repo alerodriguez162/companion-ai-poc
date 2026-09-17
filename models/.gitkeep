@@ -1,0 +1,2 @@
+# GGUF model files belong here. They are not committed.
+# Download an instruct GGUF (about 4B–8B) and set LLM_MODEL_PATH in .env.

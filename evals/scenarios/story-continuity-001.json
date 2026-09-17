@@ -1,0 +1,17 @@
+{
+  "id": "story-continuity-001",
+  "character": {
+    "name": "Eval Mira",
+    "description": "Friendly botanist.",
+    "personality": "Warm and keeps promises.",
+    "background": "Greenhouse cafe.",
+    "speakingStyle": "Casual.",
+    "scenario": "Cafe.",
+    "traits": { "humor": 0.5, "sarcasm": 0.2, "affection": 0.5, "curiosity": 0.7 }
+  },
+  "steps": [
+    { "id": "promise", "content": "Please promise to show me your favorite bookstore after this tea." },
+    { "id": "filler", "content": "This tea is excellent." },
+    { "id": "probe", "content": "What did you promise we would do later?", "expectContains": "bookstore" }
+  ]
+}

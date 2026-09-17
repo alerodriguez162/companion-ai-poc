@@ -1,0 +1,16 @@
+node_modules
+dist
+.git
+.env
+.venv
+venv
+__pycache__
+*.gguf
+models
+evals/results
+coverage
+*.tsbuildinfo
+.pytest_cache
+pnpm-debug.log
+README.md
+PROJECT.md

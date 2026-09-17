@@ -1,0 +1,45 @@
+body {
+  font-family: sans-serif;
+  margin: 1.5rem auto;
+  max-width: 52rem;
+  line-height: 1.4;
+  background: #f7f7f7;
+  color: #111;
+}
+
+nav a {
+  margin-right: 1rem;
+}
+
+form {
+  display: grid;
+  gap: 0.6rem;
+  margin-top: 1rem;
+}
+
+input,
+textarea,
+button {
+  font: inherit;
+}
+
+ul {
+  padding-left: 1.2rem;
+}
+
+li {
+  margin-bottom: 0.8rem;
+}
+
+article {
+  border-top: 1px solid #ccc;
+  padding: 0.6rem 0;
+}
+
+pre {
+  overflow: auto;
+  background: #111;
+  color: #eee;
+  padding: 0.8rem;
+  font-size: 0.85rem;
+}

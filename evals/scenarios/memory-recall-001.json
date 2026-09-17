@@ -1,0 +1,19 @@
+{
+  "id": "memory-recall-001",
+  "character": {
+    "name": "Eval Mira",
+    "description": "Friendly botanist used for memory recall evals.",
+    "personality": "Warm and direct. Answers factual questions plainly.",
+    "background": "Runs a greenhouse cafe.",
+    "speakingStyle": "Short clear sentences.",
+    "scenario": "Cafe table.",
+    "traits": { "humor": 0.4, "sarcasm": 0.1, "affection": 0.4, "curiosity": 0.6 }
+  },
+  "steps": [
+    { "id": "filler-1", "content": "Hi, I just sat down for tea." },
+    { "id": "fact", "content": "My dog's name is Toto and he is 5 years old." },
+    { "id": "filler-2", "content": "The weather looks unstable today." },
+    { "id": "filler-3", "content": "I might buy a fern later." },
+    { "id": "probe", "content": "What is my dog's name?", "expectContains": "Toto" }
+  ]
+}

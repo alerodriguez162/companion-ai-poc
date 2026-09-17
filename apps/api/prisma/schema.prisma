@@ -1,0 +1,111 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum MessageRole {
+  USER
+  ASSISTANT
+  SYSTEM
+}
+
+enum MemoryType {
+  USER_FACT
+  CHARACTER_FACT
+  RELATIONSHIP_EVENT
+  STORY_EVENT
+  PREFERENCE
+  PROMISE
+  IMPORTANT_EVENT
+}
+
+enum RelationshipStage {
+  STRANGER
+  ACQUAINTANCE
+  FRIEND
+  CLOSE_FRIEND
+}
+
+model Character {
+  id            String         @id @default(uuid()) @db.Uuid
+  name          String
+  description   String
+  personality   String
+  background    String
+  speakingStyle String
+  scenario      String
+  traits        Json
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  conversations Conversation[]
+  memories      Memory[]
+}
+
+model Conversation {
+  id                String             @id @default(uuid()) @db.Uuid
+  characterId       String             @db.Uuid
+  character         Character          @relation(fields: [characterId], references: [id], onDelete: Cascade)
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  lastDebug         Json?
+  messages          Message[]
+  memories          Memory[]
+  storyState        StoryState?
+  relationshipState RelationshipState?
+}
+
+model Message {
+  id             String       @id @default(uuid()) @db.Uuid
+  conversationId String       @db.Uuid
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  role           MessageRole
+  content        String
+  tokenCount     Int?
+  metadata       Json?
+  createdAt      DateTime     @default(now())
+
+  @@index([conversationId, createdAt])
+}
+
+model Memory {
+  id             String        @id @default(uuid()) @db.Uuid
+  characterId    String        @db.Uuid
+  character      Character     @relation(fields: [characterId], references: [id], onDelete: Cascade)
+  conversationId String?       @db.Uuid
+  conversation   Conversation? @relation(fields: [conversationId], references: [id], onDelete: SetNull)
+  type           MemoryType
+  content        String
+  importance     Float
+  embedding      Unsupported("vector")?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  @@index([characterId, createdAt])
+}
+
+model StoryState {
+  id              String       @id @default(uuid()) @db.Uuid
+  conversationId  String       @unique @db.Uuid
+  conversation    Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  currentScene    String
+  location        String
+  participants    Json
+  activeEvents    Json
+  openThreads     Json
+  timelineSummary String
+  updatedAt       DateTime     @updatedAt
+}
+
+model RelationshipState {
+  id                String            @id @default(uuid()) @db.Uuid
+  conversationId    String            @unique @db.Uuid
+  conversation      Conversation      @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  affinity          Int
+  trust             Int
+  relationshipStage RelationshipStage
+  updatedAt         DateTime          @updatedAt
+}

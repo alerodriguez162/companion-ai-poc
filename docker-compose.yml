@@ -1,0 +1,89 @@
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-companion}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-companion}
+      POSTGRES_DB: ${POSTGRES_DB:-companion}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-companion} -d ${POSTGRES_DB:-companion}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  ai:
+    build:
+      context: ./apps/ai
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    environment:
+      AI_PORT: 8000
+      # Override host .env localhost URLs; native llama.cpp is reached from the container via host-gateway.
+      LLM_BASE_URL: http://host.docker.internal:8080
+      LLM_MODEL_PATH: /models/model.gguf
+      LLM_CONTEXT_SIZE: ${LLM_CONTEXT_SIZE:-8192}
+      LLM_TEMPERATURE: ${LLM_TEMPERATURE:-0.7}
+      LLM_MAX_TOKENS: ${LLM_MAX_TOKENS:-512}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      DEBUG_PROMPT_LOGGING: ${DEBUG_PROMPT_LOGGING:-false}
+    ports:
+      - "${AI_PORT:-8000}:8000"
+    volumes:
+      - ./models:/models:ro
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    env_file:
+      - .env
+    environment:
+      API_PORT: 3001
+      AI_SERVICE_URL: http://ai:8000
+      DATABASE_URL: postgresql://${POSTGRES_USER:-companion}:${POSTGRES_PASSWORD:-companion}@postgres:5432/${POSTGRES_DB:-companion}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+    ports:
+      - "${API_PORT:-3001}:3001"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      ai:
+        condition: service_started
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    ports:
+      - "${WEB_PORT:-5173}:80"
+    depends_on:
+      - api
+
+  # Optional. On Windows/macOS, a native llama.cpp server is usually better.
+  # Start with: docker compose --profile llm up
+  llm:
+    profiles: ["llm"]
+    image: ghcr.io/ggml-org/llama.cpp:server
+    volumes:
+      - ./models:/models:ro
+    ports:
+      - "8080:8080"
+    command:
+      - "-m"
+      - "/models/model.gguf"
+      - "--host"
+      - "0.0.0.0"
+      - "--port"
+      - "8080"
+      - "-c"
+      - "${LLM_CONTEXT_SIZE:-8192}"
+
+volumes:
+  postgres_data:

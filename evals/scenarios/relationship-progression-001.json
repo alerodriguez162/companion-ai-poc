@@ -1,0 +1,17 @@
+{
+  "id": "relationship-progression-001",
+  "character": {
+    "name": "Eval Mira",
+    "description": "Friendly botanist.",
+    "personality": "Warm.",
+    "background": "Cafe.",
+    "speakingStyle": "Casual.",
+    "scenario": "Cafe.",
+    "traits": { "humor": 0.6, "sarcasm": 0.2, "affection": 0.7, "curiosity": 0.6 }
+  },
+  "steps": [
+    { "id": "kind-1", "content": "Thanks for making time for me. I brought pastries for the staff." },
+    { "id": "kind-2", "content": "I trust your recommendation completely." },
+    { "id": "probe", "content": "How close would you say we are right now?" }
+  ]
+}
